@@ -349,7 +349,7 @@ def connect_stripe():
 
     try:
         if not current_user.stripe_account_id:
-            country = (app.config.get('STRIPE_CONNECT_COUNTRY') or 'FR').strip().upper()
+            country = (app.config.get('STRIPE_CONNECT_COUNTRY') or 'BE').strip().upper()
             # Prefer Express; if country fails, retry with US (best for Test mode)
             try:
                 account = stripe.Account.create(
