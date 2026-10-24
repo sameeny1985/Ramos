@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}{{ _('my_sales') }} — {{ _('site_name') }}{% endblock %}
+{% block content %}
+<h2 class="mb-4">{{ _('received_orders') }}</h2>
+{% if items %}
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>#</th><th>{{ _('product') }}</th><th>{{ _('quantity') }}</th><th>{{ _('amount') }}</th><th>{{ _('date') }}</th><th>{{ _('stripe_transfer') }}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in items %}
+        <tr>
+            <td>#{{ item.order_id }}</td>
+            <td>{{ item.product.name }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>{{ "%.2f"|format((item.price * item.quantity)/100) }} €</td>
+            <td>{{ item.order.created_at.strftime('%Y-%m-%d') }}</td>
+            <td>{% if item.transfer_id %}<span class="badge bg-success">{{ item.transfer_id[:12] }}...</span>{% else %}<span class="badge bg-secondary">{{ _('pending') }}</span>{% endif %}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p class="text-muted text-center py-5">{{ _('no_sales_yet') }}</p>
+{% endif %}
+{% endblock %}
