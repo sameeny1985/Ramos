@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}{{ _('add_product') }} — {{ _('site_name') }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow"><div class="card-body p-4">
+            <h3 class="mb-4">{{ _('add_product') }}</h3>
+            <form method="post" enctype="multipart/form-data">
+                <div class="mb-3"><label class="form-label">{{ _('product_name') }}</label><input type="text" name="name" class="form-control" required></div>
+                <div class="mb-3"><label class="form-label">{{ _('description') }}</label><textarea name="description" class="form-control" rows="4"></textarea></div>
+                <div class="row">
+                    <div class="col-md-6 mb-3"><label class="form-label">{{ _('price_usd') }}</label><input type="number" name="price" class="form-control" step="0.01" min="0.5" required></div>
+                    <div class="col-md-6 mb-3"><label class="form-label">{{ _('stock') }}</label><input type="number" name="stock" class="form-control" min="0" value="1" required></div>
+                </div>
+                <div class="mb-3"><label class="form-label">{{ _('product_image') }}</label><input type="file" name="image" class="form-control" accept="image/*"></div>
+                <button type="submit" class="btn btn-primary">{{ _('save_product') }}</button>
+                <a href="{{ url_for('seller_dashboard') }}" class="btn btn-secondary">{{ _('cancel') }}</a>
+            </form>
+        </div></div>
+    </div>
+</div>
+{% endblock %}

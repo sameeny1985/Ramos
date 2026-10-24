@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}{{ product.name }} — {{ _('site_name') }}{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-md-6">
+        {% if product.image_url %}
+        <img src="{{ product.image_url }}" class="img-fluid rounded shadow" alt="{{ product.name }}">
+        {% else %}
+        <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 350px;">
+            <i class="bi bi-image text-muted" style="font-size: 5rem;"></i>
+        </div>
+        {% endif %}
+    </div>
+    <div class="col-md-6">
+        <h2>{{ product.name }}</h2>
+        <p class="text-muted">{{ _('seller') }}: <strong>{{ product.seller.username }}</strong></p>
+        <h3 class="text-primary my-3">{{ product.price_display() }} €</h3>
+        <p>{{ product.description or _('no_description') }}</p>
+        <p>{{ _('stock') }}: <span class="badge bg-{{ 'success' if product.stock > 0 else 'danger' }}">{{ product.stock }}</span></p>
+        {% if current_user.is_authenticated %}
+            {% if product.stock > 0 %}
+            <form action="{{ url_for('add_to_cart', product_id=product.id) }}" method="post">
+                <button type="submit" class="btn btn-primary btn-lg"><i class="bi bi-cart-plus"></i> {{ _('add_to_cart') }}</button>
+            </form>
+            {% else %}
+            <button class="btn btn-secondary" disabled>{{ _('out_of_stock') }}</button>
+            {% endif %}
+        {% else %}
+        <a href="{{ url_for('login') }}" class="btn btn-outline-primary">{{ _('login_to_buy') }}</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

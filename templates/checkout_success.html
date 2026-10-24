@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}{{ _('payment_success') }} — {{ _('site_name') }}{% endblock %}
+{% block content %}
+<div class="text-center py-5">
+    <i class="bi bi-check-circle-fill text-success" style="font-size: 5rem;"></i>
+    <h2 class="mt-3">{{ _('payment_success') }}</h2>
+    <p class="lead">{{ _('order_number') }}: #{{ order.id }}</p>
+    <p>{{ _('amount') }}: {{ order.total_display() }} €</p>
+    <p class="text-muted">{{ _('status') }}: {{ order.status }}</p>
+    <a href="{{ url_for('my_orders') }}" class="btn btn-primary mt-3">{{ _('view_orders') }}</a>
+    <a href="{{ url_for('index') }}" class="btn btn-outline-secondary mt-3">{{ _('back_to_shop') }}</a>
+</div>
+{% endblock %}
