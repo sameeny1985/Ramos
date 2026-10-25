@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}{{ _('home') }} — {{ _('site_name') }}{% endblock %}
+{% block content %}
+
+{# ===== Hero banner — put your image at: static/img/hero.jpg ===== #}
+<section class="hero-banner mb-5 rounded-4 overflow-hidden shadow-sm">
+    <img src="{{ url_for('static', filename='img/hero.jpg') }}"
+         alt="{{ _('site_name') }}"
+         class="hero-img"
+         onerror="this.style.display='none'; this.parentElement.classList.add('hero-fallback');">
+    <div class="hero-overlay">
+        <h1 class="display-5 fw-bold text-white mb-2">{{ _('welcome_title') }}</h1>
+        <p class="lead text-white-50 mb-0">{{ _('welcome_subtitle') }}</p>
+    </div>
+</section>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="h4 mb-0">{{ _('products') }}</h2>
+</div>
+
+<div class="row g-3">
+    {% for product in products %}
+    <div class="col-6 col-md-4 col-lg-3">
+        <a href="{{ url_for('product_detail', product_id=product.id) }}" class="text-decoration-none text-dark">
+            <div class="card h-100 shadow-sm product-card border-0">
+                {% set cover = product.cover_url() %}
+                {% if cover %}
+                <img src="{{ cover }}" class="card-img-top product-thumb" alt="{{ product.name }}">
+                {% else %}
+                <div class="bg-light d-flex align-items-center justify-content-center product-thumb">
+                    <i class="bi bi-image text-muted" style="font-size: 2rem;"></i>
+                </div>
+                {% endif %}
+                <div class="card-body p-2 p-md-3">
+                    <h6 class="card-title mb-1 text-truncate">{{ product.name }}</h6>
+                    <p class="card-text text-muted small mb-2 product-excerpt">{{ product.short_description(80) }}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="fw-bold text-primary">{{ product.price_display() }} €</span>
+                        <small class="text-muted text-truncate" style="max-width:45%">{{ product.seller.username }}</small>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+    {% else %}
+    <div class="col-12 text-center py-5">
+        <p class="text-muted">{{ _('no_products') }}</p>
+        {% if current_user.is_authenticated and current_user.is_seller %}
+        <a href="{{ url_for('add_product') }}" class="btn btn-primary">{{ _('add_first_product') }}</a>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
