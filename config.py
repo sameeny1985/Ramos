@@ -39,4 +39,4 @@ class Config:
     GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET')
 
     ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL', 'shapyaar@gmail.com')
-   STRIPE_CONNECT_COUNTRY = os.environ.get('STRIPE_CONNECT_COUNTRY', 'BE').strip().upper()
+    STRIPE_CONNECT_COUNTRY = os.environ.get('STRIPE_CONNECT_COUNTRY', 'BE').strip().upper()
