@@ -33,7 +33,7 @@ services:
       - key: ADMIN_EMAIL
         value: "shapyaar@gmail.com"
       - key: STRIPE_CONNECT_COUNTRY
-        value: "FR"
+        value: "BE"
 
 databases:
   - name: ramos-db
