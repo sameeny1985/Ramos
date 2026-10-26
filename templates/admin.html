@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+{% block title %}{{ _('admin_panel') }} — {{ _('site_name') }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <h2 class="mb-0"><i class="bi bi-shield-lock"></i> {{ _('admin_panel') }}</h2>
+</div>
+
+<!-- Stats cards -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <div class="text-muted small">{{ _('users') }}</div>
+                <div class="fs-3 fw-bold text-primary">{{ stats.users }}</div>
+                <div class="small text-success">{{ stats.sellers }} {{ _('seller') }}s</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <div class="text-muted small">{{ _('products') }}</div>
+                <div class="fs-3 fw-bold text-primary">{{ stats.products }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <div class="text-muted small">{{ _('recent_orders') }}</div>
+                <div class="fs-3 fw-bold text-primary">{{ stats.orders }}</div>
+                <div class="small text-success">{{ stats.paid_orders }} paid</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <div class="text-muted small">Revenue / Fees</div>
+                <div class="fs-5 fw-bold text-success">{{ "%.2f"|format(stats.revenue/100) }} €</div>
+                <div class="small text-muted">Fees: {{ "%.2f"|format(stats.fees/100) }} €</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tabs -->
+<ul class="nav nav-tabs mb-3" role="tablist">
+    <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-users" type="button">{{ _('users') }} ({{ users|length }})</button></li>
+    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-products" type="button">{{ _('products') }} ({{ products|length }})</button></li>
+    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-orders" type="button">{{ _('recent_orders') }} ({{ orders|length }})</button></li>
+</ul>
+
+<div class="tab-content">
+    <!-- Users -->
+    <div class="tab-pane fade show active" id="tab-users">
+        <div class="table-responsive card border-0 shadow-sm">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>{{ _('username') }}</th>
+                        <th>{{ _('email') }}</th>
+                        <th>Rôles</th>
+                        <th>{{ _('date') }}</th>
+                        <th class="text-end">{{ _('actions') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in users %}
+                    <tr>
+                        <td class="text-muted">#{{ u.id }}</td>
+                        <td class="fw-semibold">{{ u.username }}</td>
+                        <td>{{ u.email }}</td>
+                        <td>
+                            {% if u.is_admin %}<span class="badge bg-danger">Admin</span>{% endif %}
+                            {% if u.is_seller %}<span class="badge bg-info text-dark">{{ _('seller') }}</span>{% endif %}
+                            {% if not u.is_admin and not u.is_seller %}<span class="badge bg-secondary">User</span>{% endif %}
+                        </td>
+                        <td class="small text-muted">{{ u.created_at.strftime('%Y-%m-%d') if u.created_at else '—' }}</td>
+                        <td class="text-end text-nowrap">
+                            <form action="{{ url_for('admin_toggle_seller', user_id=u.id) }}" method="post" class="d-inline">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button class="btn btn-sm btn-outline-info" title="Toggle seller">{{ _('seller') }}</button>
+                            </form>
+                            {% if u.id != current_user.id %}
+                            <form action="{{ url_for('admin_toggle_admin', user_id=u.id) }}" method="post" class="d-inline">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button class="btn btn-sm btn-outline-danger" title="Toggle admin">Admin</button>
+                            </form>
+                            <form action="{{ url_for('admin_delete_user', user_id=u.id) }}" method="post" class="d-inline" onsubmit="return confirm('Supprimer {{ u.username }} ?')">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button class="btn btn-sm btn-outline-secondary"><i class="bi bi-trash"></i></button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="6" class="text-center text-muted py-4">—</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Products -->
+    <div class="tab-pane fade" id="tab-products">
+        <div class="table-responsive card border-0 shadow-sm">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>{{ _('product_name') }}</th>
+                        <th>{{ _('seller') }}</th>
+                        <th>{{ _('price') }}</th>
+                        <th>{{ _('stock') }}</th>
+                        <th>{{ _('status') }}</th>
+                        <th class="text-end">{{ _('actions') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in products %}
+                    <tr class="{% if not p.is_active %}table-secondary{% endif %}">
+                        <td class="text-muted">#{{ p.id }}</td>
+                        <td class="fw-semibold">{{ p.name }}</td>
+                        <td>{{ p.seller.username if p.seller else '—' }}</td>
+                        <td>{{ p.price_display() }} €</td>
+                        <td>{{ p.stock }}</td>
+                        <td>
+                            {% if p.is_active %}<span class="badge bg-success">{{ _('active') }}</span>
+                            {% else %}<span class="badge bg-secondary">{{ _('inactive') }}</span>{% endif %}
+                        </td>
+                        <td class="text-end text-nowrap">
+                            <a href="{{ url_for('admin_edit_product', product_id=p.id) }}" class="btn btn-sm btn-outline-primary">{{ _('edit') }}</a>
+                            <form action="{{ url_for('admin_toggle_product', product_id=p.id) }}" method="post" class="d-inline">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button class="btn btn-sm btn-outline-warning">{% if p.is_active %}Off{% else %}On{% endif %}</button>
+                            </form>
+                            <form action="{{ url_for('admin_delete_product', product_id=p.id) }}" method="post" class="d-inline" onsubmit="return confirm('Désactiver ?')">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="7" class="text-center text-muted py-4">—</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Orders -->
+    <div class="tab-pane fade" id="tab-orders">
+        <div class="table-responsive card border-0 shadow-sm">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Buyer</th>
+                        <th>{{ _('amount') }}</th>
+                        <th>Fee</th>
+                        <th>{{ _('status') }}</th>
+                        <th>{{ _('date') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for o in orders %}
+                    <tr>
+                        <td class="fw-semibold">#{{ o.id }}</td>
+                        <td>{{ o.buyer.username if o.buyer else o.buyer_id }}</td>
+                        <td>{{ o.total_display() }} €</td>
+                        <td class="text-muted">{{ "%.2f"|format(o.platform_fee/100) }} €</td>
+                        <td>
+                            {% if o.status == 'paid' %}<span class="badge bg-success">paid</span>
+                            {% elif o.status == 'pending' %}<span class="badge bg-warning text-dark">pending</span>
+                            {% else %}<span class="badge bg-secondary">{{ o.status }}</span>{% endif %}
+                        </td>
+                        <td class="small text-muted">{{ o.created_at.strftime('%Y-%m-%d %H:%M') if o.created_at else '—' }}</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="6" class="text-center text-muted py-4">—</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
