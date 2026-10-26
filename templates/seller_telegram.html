@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Telegram — {{ _('site_name') }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <h3 class="mb-3"><i class="bi bi-telegram"></i> {{ _('telegram_settings') }}</h3>
+                <p class="text-muted">{{ _('telegram_help') }}</p>
+                <ol class="small text-muted">
+                    <li>{{ _('telegram_step1') }}</li>
+                    <li>{{ _('telegram_step2') }}</li>
+                    <li>{{ _('telegram_step3') }}</li>
+                </ol>
+                <form method="post">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="mb-3">
+                        <label class="form-label">Chat ID / @channel</label>
+                        <input type="text" name="telegram_chat_id" class="form-control"
+                               value="{{ current_user.telegram_chat_id or '' }}"
+                               placeholder="-100xxxxxxxxxx or @mychannel">
+                    </div>
+                    <button type="submit" class="btn btn-primary">{{ _('save_changes') }}</button>
+                    <a href="{{ url_for('seller_dashboard') }}" class="btn btn-secondary">{{ _('cancel') }}</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

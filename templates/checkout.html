@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Checkout — {{ _('site_name') }}{% endblock %}
+{% block content %}
+<h2 class="mb-4">Checkout</h2>
+<div class="row g-4">
+    <div class="col-md-7">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <h5 class="mb-3">{{ _('delivery_info') }}</h5>
+                <form method="post" action="{{ url_for('checkout') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('full_name') }} *</label>
+                        <input type="text" name="buyer_name" class="form-control" required
+                               value="{{ current_user.username }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('phone') }} *</label>
+                        <input type="tel" name="buyer_phone" class="form-control" required
+                               placeholder="+32 ...">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('address') }} *</label>
+                        <textarea name="buyer_address" class="form-control" rows="3" required
+                                  placeholder="Street, number, city, postcode, country"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-success btn-lg w-100">
+                        <i class="bi bi-credit-card"></i> {{ _('pay_with_stripe') }}
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-5">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <h5>{{ _('cart') }}</h5>
+                <ul class="list-group list-group-flush mb-3">
+                    {% for item in items %}
+                    <li class="list-group-item d-flex justify-content-between px-0">
+                        <span>{{ item.product.name }} × {{ item.quantity }}</span>
+                        <span>{{ "%.2f"|format((item.product.price * item.quantity)/100) }} €</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+                <h4>{{ _('total') }}: <span class="text-primary">{{ "%.2f"|format(total/100) }} €</span></h4>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
